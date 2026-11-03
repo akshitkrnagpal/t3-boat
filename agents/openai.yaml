@@ -1,4 +1,4 @@
 interface:
   display_name: "T3 Code on Boat"
   short_description: "Install T3 Code and remote access on Boat VMs"
-  default_prompt: "Use $t3boat-skill to set up T3 Code on my Boat VM."
+  default_prompt: "Use $t3-boat to set up T3 Code on my Boat VM."

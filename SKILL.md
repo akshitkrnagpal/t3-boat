@@ -1,6 +1,10 @@
 ---
-name: t3boat-skill
+name: t3-boat
 description: Install or repair T3 Code on a Boat VM through boat ssh, with a chosen stable or nightly release, Tailscale or T3 Connect access, and GitHub and Claude authentication for the background service. Also use for exposing an app dev server on that VM when requested.
+license: MIT
+metadata:
+  version: "1.0.0"
+  verified-t3: "v0.1.6 stable, v0.1.7-nightly.20261103.4119"
 ---
 
 # T3 Code on Boat

@@ -1,4 +1,4 @@
-# t3boat-skill
+# t3-boat
 
 An agent skill for installing and repairing [T3 Code](https://t3.codes) on
 [Boat](https://boat.dev) VMs. It captures the setup details that are easy to miss
@@ -15,24 +15,32 @@ is available when requested.
 With a skill installer that supports GitHub repositories:
 
 ```sh
-npx skills add akshitkrnagpal/t3boat-skill
+npx skills add akshitkrnagpal/t3-boat
 ```
 
-Or clone directly into your agent's skills directory. For Codex:
+Or clone it into your agent's skills directory:
 
 ```sh
-git clone https://github.com/akshitkrnagpal/t3boat-skill.git \
-  ~/.codex/skills/t3boat-skill
+# Claude Code
+git clone https://github.com/akshitkrnagpal/t3-boat.git ~/.claude/skills/t3-boat
+# Codex
+git clone https://github.com/akshitkrnagpal/t3-boat.git ~/.codex/skills/t3-boat
 ```
 
-For Claude Code, use `~/.claude/skills/t3boat-skill` instead. If that directory
-already exists, update its existing checkout rather than cloning over it.
-Reload your agent's skills if it does not discover the new skill immediately.
+If that directory already exists, `git pull` inside it instead. Reload your
+agent's skills if it does not discover the new skill immediately.
+
+Claude Code reads only the `name` and `description` in `SKILL.md`, so it needs
+no other metadata. `agents/openai.yaml` supplies the display name and default
+prompt Codex shows in its UI.
+
+Upgrading from `t3boat-skill`: remove the old skill directory and install
+`t3-boat`, then use `$t3-boat` in prompts.
 
 ## Use it
 
 ```text
-Use $t3boat-skill to set up T3 Code on my Boat VM <vm-id>.
+Use $t3-boat to set up T3 Code on my Boat VM <vm-id>.
 ```
 
 You need access through the Boat CLI (`boat ssh <vm-id>`) and a VM that supports
@@ -56,5 +64,45 @@ choose a release channel for you, or publish application ports automatically.
 The operational instructions live in [SKILL.md](SKILL.md). Supporting references
 cover [authentication](references/authentication.md),
 [remote access](references/remote-access.md), and
-[application dev servers](references/dev-servers.md). No personal VM identifiers,
-credentials, account-specific hostnames, or pairing tokens belong in this repo.
+[application dev servers](references/dev-servers.md).
+
+## Troubleshooting
+
+**`could not read Username for 'https://github.com': terminal prompts disabled`**
+GitHub CLI is logged in but Git is not using it. Run
+`gh auth setup-git --hostname github.com` on the VM. No T3 restart is needed.
+
+**Claude works over SSH but T3 says it is not logged in.** Your shell sets
+`CLAUDE_CODE_OAUTH_TOKEN` and the systemd service does not inherit it. Ask the
+agent to repair Claude authentication; it moves the token into T3's
+`service.env` and restarts the service once.
+
+**`t3 pair --tailscale` fails with an access or permission error.** The VM user
+is not the Tailscale operator. Run `sudo tailscale set --operator="$(id -un)"`,
+unless another operator is already set on purpose.
+
+**Tailscale Serve says HTTPS is not enabled.** Enable HTTPS certificates for
+your tailnet in the Tailscale admin console (DNS settings), then pair again.
+The first certificate can take a minute to issue.
+
+**The pairing link expired.** Links last five minutes. Run
+`t3 pair --tailscale --tailscale-serve-port <port>` again with the same port
+you set up. Nothing needs reinstalling, and devices already paired stay paired.
+
+**`t3: command not found` over `boat ssh`.** Non-interactive SSH may not load
+your shell's PATH. Use `~/.local/bin/t3`.
+
+**Your app's dev server is unreachable from another device.** Check, in order:
+it listens on `0.0.0.0` (not `127.0.0.1`), the framework allows the tailnet
+hostname, you used `http://` with the explicit port, and both devices are on
+the tailnet. See [application dev servers](references/dev-servers.md).
+
+## Keeping up with T3 Code
+
+`scripts/check-cli.sh` confirms that every `t3` command and flag the skill uses
+still exists. Run it locally, or against a VM with `scripts/check-cli.sh <vm-id>`.
+`metadata.verified-t3` in `SKILL.md` records the last versions it passed on.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for changes and releases,
+[SECURITY.md](SECURITY.md) for reporting a credential leak, and
+[CHANGELOG.md](CHANGELOG.md) for history. Licensed under [MIT](LICENSE).
