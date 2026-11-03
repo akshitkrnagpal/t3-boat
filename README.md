@@ -85,6 +85,11 @@ unless another operator is already set on purpose.
 your tailnet in the Tailscale admin console (DNS settings), then pair again.
 The first certificate can take a minute to issue.
 
+**The Tailscale HTTPS address stopped resolving after a VM restore.** Boat
+changed the VM's hostname and Tailscale followed it. Ask the agent to repair
+remote access: it pins the tailnet name with `tailscale set --hostname` and
+pairs again. Devices paired to the old address must pair again once.
+
 **The pairing link expired.** Links last five minutes. Run
 `t3 pair --tailscale --tailscale-serve-port <port>` again with the same port
 you set up. Nothing needs reinstalling, and devices already paired stay paired.

@@ -26,8 +26,26 @@ sudo tailscale set --operator="$(id -un)"
 
 This changes the local Tailscale operator. If an existing operator is different,
 resolve that ownership conflict with the user rather than replacing it silently.
-Check `tailscale ip -4` and discover the real tailnet DNS name from status;
-never derive it from a previous VM's name.
+Pin the tailnet name. By default Tailscale follows the OS hostname, and Boat
+can change that when it restores or moves a VM, which breaks the HTTPS origin
+and every paired client. Check `tailscale debug prefs` for `Hostname`. If it
+is empty, set one derived from the stable Boat VM ID (for example
+`bx_abc123` becomes `boat-abc123`), unless the user picked a name:
+
+```sh
+sudo tailscale set --hostname=boat-<vm-id-suffix>
+```
+
+Check the name is free in `tailscale status` first; a taken name gets a numeric
+suffix. Reuse an existing `Hostname` preference rather than renaming. Then read
+the real tailnet DNS name and `tailscale ip -4` from status; never derive the
+name from a previous VM's name.
+
+On an existing host, compare `tailscale status --json` `Self.DNSName` with the
+names in `tailscale serve status`. If Serve lists only an old name, the origin
+is stale: pin the name as above, then run the pairing command below, which adds
+the route for the current name. Leave the stale entry alone, and tell the user
+that devices paired to the old URL must pair again.
 
 Inspect `tailscale serve status` before changing mappings. The desired T3 HTTPS
 origin normally proxies `/` on port 443 to `http://127.0.0.1:3773`, but use the

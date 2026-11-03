@@ -5,10 +5,17 @@ Versions follow [Semantic Versioning](https://semver.org). The version lives in
 releases whose CLI the skill was last checked against with
 `scripts/check-cli.sh`.
 
+## 1.0.2 - 2026-11-04
+
+- Pin the Tailscale machine name with `tailscale set --hostname`, so a Boat
+  restore that changes the OS hostname no longer breaks the HTTPS origin.
+- Detect a stale Serve origin on existing hosts and re-pair under the current
+  name.
+
 ## 1.0.1 - 2026-11-03
 
-- Fixed restart guidance: `t3 update` run over noninteractive SSH no longer
-  restarts the service without `--yes`, and `t3 service restart` restarts
+- Fixed restart guidance: `t3 update` run over noninteractive SSH does not
+  restart the service without `--yes`, and `t3 service restart` restarts
   immediately without a prompt. Updates now pass `--yes` once the restart is
   agreed and confirm the running version afterwards. Downgrades need
   `--allow-downgrade` with the user's agreement.
