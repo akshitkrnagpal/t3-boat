@@ -3,7 +3,7 @@ name: t3-boat
 description: Install or repair T3 Code on a Boat VM through boat ssh, with a chosen stable or nightly release, Tailscale or T3 Connect access, and GitHub and Claude authentication for the background service. Also use for exposing an app dev server on that VM when requested.
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
   verified-t3: "v0.1.6 stable, v0.1.7-nightly.20261103.4119"
 ---
 
@@ -55,8 +55,9 @@ Reuse working components. Preserve existing data, credentials, unrelated
 `service.env` entries, and network routes. Do not reimage, delete state, replace
 accounts, kill processes by name, or reset Tailscale Serve. On an existing host,
 identify active work before any restart/update; defer an interrupting change
-until the user agrees or the work finishes. T3 commands without a terminal can
-restart without prompting, so inspect before executing them.
+until the user agrees or the work finishes. Over noninteractive SSH,
+`t3 service restart` restarts immediately with no prompt, while `t3 update`
+installs but leaves the service on the old version unless given `--yes`.
 
 ## Install the selected T3 release
 
@@ -70,8 +71,11 @@ curl -fsSL https://t3.codes/install.sh | T3CODE_CHANNEL=nightly sh
 
 Run one command, not both. This installs `~/.local/bin/t3`. For an existing
 installation needing an update or channel switch, use
-`t3 update --channel <stable-or-nightly>` after resolving restart impact. Inspect
-`t3 update --help` if it requires a downgrade flag; do not silently downgrade.
+`t3 update --channel <stable-or-nightly> --yes` once the restart is agreed;
+without `--yes` the service keeps running its current version. Moving to an
+older version (nightly to stable usually is) also needs `--allow-downgrade`;
+confirm that with the user, never add it silently. Check `t3 service status`
+afterwards for the version actually running.
 
 Verify the actual installed version. Ensure `~/.local/bin` is in the remote
 login shell's PATH, adding it to the appropriate startup file only if needed.

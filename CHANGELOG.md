@@ -5,6 +5,14 @@ Versions follow [Semantic Versioning](https://semver.org). The version lives in
 releases whose CLI the skill was last checked against with
 `scripts/check-cli.sh`.
 
+## 1.0.1 - 2026-11-03
+
+- Fixed restart guidance: `t3 update` run over noninteractive SSH no longer
+  restarts the service without `--yes`, and `t3 service restart` restarts
+  immediately without a prompt. Updates now pass `--yes` once the restart is
+  agreed and confirm the running version afterwards. Downgrades need
+  `--allow-downgrade` with the user's agreement.
+
 ## 1.0.0 - 2026-11-03
 
 First tagged release. Verified against T3 Code v0.1.6 (stable) and
